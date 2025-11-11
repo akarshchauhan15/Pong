@@ -24,7 +24,7 @@ public:
 
 		if ((Position.y + Radius) >= ScreenSize.y || (Position.y - Radius) <= 0)
 			Speed.y *= -1;
-
+		
 		if ((Position.x + Radius) >= ScreenSize.x || (Position.x - Radius) <= 0)
 			Speed.x *= -1;
 	}
@@ -93,6 +93,14 @@ int main() {
 		ball.Update();
 		PlayerPaddle.Move();
 		AIPaddle.Move(ball.Position.y);
+
+		//Checking collisions
+
+		bool CollisionWithPlayerPaddle = CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ PlayerPaddle.Position.x, PlayerPaddle.Position.y, (float)PlayerPaddle.Width, (float)PlayerPaddle.Height });
+		bool CollisionWithAIPaddle = CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ AIPaddle.Position.x, AIPaddle.Position.y, (float)AIPaddle.Width, (float)AIPaddle.Height });
+
+		if (CollisionWithPlayerPaddle || CollisionWithAIPaddle)
+			ball.Speed.x *= -1;
 
 		BeginDrawing();
 
