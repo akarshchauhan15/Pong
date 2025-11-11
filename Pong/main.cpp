@@ -2,13 +2,24 @@
 
 Vector2 ScreenSize = { 1280, 720 };
 
+int PlayerScore = 0;
+int AIScore = 0;
+
+bool isPlaying = false;
+
+Color BackgroundColor = { 30, 150, 121, 255 };
+Color HighlightedCircleColorBack = { 55, 179, 149, 255 };
+Color HighlightedCircleColorFront = { 87, 210, 170, 255 };
+Color PaddleColor = { 109, 194, 185, 255 };
+Color FavorVictoryColor = { 146, 240, 220, 255 };
+
 class Ball {
 public:
 	Vector2 Position;
 	Vector2 Speed;
 	int Radius;
 
-	Ball(int radius, Vector2 position, Vector2 speed) {
+	Ball(int radius = 16, Vector2 position = { ScreenSize.x / 2, ScreenSize.y / 2 }, Vector2 speed = { 0, 0 }) {
 		Radius = radius;
 		Position = position;
 		Speed = speed;
@@ -24,9 +35,23 @@ public:
 
 		if ((Position.y + Radius) >= ScreenSize.y || (Position.y - Radius) <= 0)
 			Speed.y *= -1;
-		
-		if ((Position.x + Radius) >= ScreenSize.x || (Position.x - Radius) <= 0)
-			Speed.x *= -1;
+
+
+		if ((Position.x - Radius) >= ScreenSize.x) {
+			PlayerScore++;
+			ResetBall();
+		}
+			
+		else if ((Position.x + Radius) <= 0) {
+			AIScore++;
+			ResetBall();
+		}
+	}
+	
+	void ResetBall() {
+		Position = { ScreenSize.x / 2, ScreenSize.y / 2 };
+
+		Speed = { Speed.x * (GetRandomValue(0, 1) - 0.5f) * 2, Speed.y * (GetRandomValue(0, 1) - 0.5f) * 2 };
 	}
 };
 
@@ -37,16 +62,17 @@ public:
 	int Height;
 	int Offset = 10;
 	int Speed = 3;
-	Color Color = { 109, 194, 185, 255 };
 
-	Paddle(float PositionX = 0, int width = 24, int height = 180) {
+	Paddle(float PositionX = 0, int width = 20, int height = 160) {
 		Width = width;
 		Height = height;
 		Position = { PositionX, (ScreenSize.y - Height)/2 };
 	}
 
 	void Draw() {
-		DrawRectangle(Position.x, Position.y, Width, Height, Color);
+		//DrawRectangle(Position.x, Position.y, Width, Height, Color);
+		Rectangle Rect = { Position.x, Position.y, Width, Height };
+		DrawRectangleRounded(Rect, 0.8f, 0, PaddleColor);
 	}
 
 	void Move() {
@@ -68,16 +94,28 @@ public:
 	}
 };
 
+void DrawScores() {
+
+	Color PlayerColor = WHITE;
+	Color AIColor = WHITE;
+
+	if (PlayerScore > AIScore)
+		PlayerColor = FavorVictoryColor;
+	else if (AIScore > PlayerScore)
+		AIColor = FavorVictoryColor;
+
+	DrawText(TextFormat("%i", PlayerScore), ScreenSize.x / 4 - 20, 20, 80, PlayerColor);
+	DrawText(TextFormat("%i", AIScore), 3 * ScreenSize.x / 4 - 20, 20, 80, AIColor);
+}
 
 Paddle PlayerPaddle = Paddle();
-CpuPaddle AIPaddle= CpuPaddle();
-Ball ball = Ball(16, { ScreenSize.x / 2, ScreenSize.y / 2 }, { 4, 4 });
+CpuPaddle AIPaddle = CpuPaddle();
+Ball ball = Ball();
 
 int main() {
 
 	//Ready
-
-	Color BackgroundColor = { 8, 94, 73, 255 };
+	ball.Speed = { 4, 4 };
 
 	PlayerPaddle.Position = { float(PlayerPaddle.Offset) , PlayerPaddle.Position.y };
 	AIPaddle.Position = { ScreenSize.x - float(AIPaddle.Offset) - AIPaddle.Width , AIPaddle.Position.y};
@@ -106,12 +144,18 @@ int main() {
 
 		//Drawing objects to screen
 		ClearBackground(BackgroundColor);
-		ball.Draw(); //Ball
 
+		//Decorations
+		DrawCircle(ScreenSize.x / 2, ScreenSize.y / 2, 180, HighlightedCircleColorBack);
+		DrawCircle(ScreenSize.x / 2, ScreenSize.y / 2, 80, HighlightedCircleColorFront);
 		DrawLine(ScreenSize.x / 2, 0, ScreenSize.x / 2, ScreenSize.y, WHITE); //Seperator
 
+		//Objects
+		ball.Draw();
 		PlayerPaddle.Draw();
 		AIPaddle.Draw();
+
+		DrawScores();
 
 		EndDrawing();
 	}
