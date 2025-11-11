@@ -30,21 +30,14 @@ public:
 	}
 };
 
-struct {
-	int Width = 24;
-	int ScreenPadding = 12;
-	int Height = 180;
-} PaddleValues;
-
-
 class Paddle {
-	public:
-		Vector2 Position;
-		int Width;
-		int Height;
-		static const int Offset = 10;
-		static const int Speed = 10;
-		Color Color = { 109, 194, 185, 255 };
+public:
+	Vector2 Position;
+	int Width;
+	int Height;
+	int Offset = 10;
+	int Speed = 3;
+	Color Color = { 109, 194, 185, 255 };
 
 	Paddle(float PositionX = 0, int width = 24, int height = 180) {
 		Width = width;
@@ -64,8 +57,20 @@ class Paddle {
 	}
 };
 
+//New inherited class derived from Paddle
+class CpuPaddle : public Paddle {
+public:
+	void Move(int BallPositionY) {
+		if (Position.y + Height / 2 > BallPositionY && Position.y >= 0)
+			Position.y -= Speed;
+		else if (Position.y + Height / 2 < BallPositionY && Position.y + Height <= ScreenSize.y)
+			Position.y += Speed;
+	}
+};
+
+
 Paddle PlayerPaddle = Paddle();
-Paddle AIPaddle = Paddle();
+CpuPaddle AIPaddle= CpuPaddle();
 Ball ball = Ball(16, { ScreenSize.x / 2, ScreenSize.y / 2 }, { 4, 4 });
 
 int main() {
@@ -74,11 +79,11 @@ int main() {
 
 	Color BackgroundColor = { 8, 94, 73, 255 };
 
-	PlayerPaddle.Position = { Paddle::Offset , PlayerPaddle.Position.y };
-	AIPaddle.Position = { ScreenSize.x - Paddle::Offset - AIPaddle.Width , AIPaddle.Position.y };
+	PlayerPaddle.Position = { float(PlayerPaddle.Offset) , PlayerPaddle.Position.y };
+	AIPaddle.Position = { ScreenSize.x - float(AIPaddle.Offset) - AIPaddle.Width , AIPaddle.Position.y};
 
 	InitWindow(ScreenSize.x, ScreenSize.y, "Pong");
-	SetTargetFPS(60);
+	SetTargetFPS(120);
 
 	//Game Loop
 
@@ -87,6 +92,7 @@ int main() {
 		//Process
 		ball.Update();
 		PlayerPaddle.Move();
+		AIPaddle.Move(ball.Position.y);
 
 		BeginDrawing();
 
