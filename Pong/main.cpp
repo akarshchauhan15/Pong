@@ -21,11 +21,17 @@ public:
 	void Update() {
 		Position.x += Speed.x;
 		Position.y += Speed.y;
+
+		if ((Position.y + Radius) >= ScreenSize.y || (Position.y - Radius) <= 0)
+			Speed.y *= -1;
+
+		if ((Position.x + Radius) >= ScreenSize.x || (Position.x - Radius) <= 0)
+			Speed.x *= -1;
 	}
 };
 
 struct {
-	int Width = 30;
+	int Width = 24;
 	int ScreenPadding = 12;
 	int Height = 180;
 } PaddleValues;
@@ -37,7 +43,7 @@ public:
 
 Paddle LeftPaddle;
 Paddle RightPaddle;
-Ball ball = Ball(20, { ScreenSize.x / 2, ScreenSize.y / 2 }, { 0, 0 });
+Ball ball = Ball(16, { ScreenSize.x / 2, ScreenSize.y / 2 }, { 4, 4 });
 
 int main() {
 
@@ -54,9 +60,12 @@ int main() {
 
 	while (WindowShouldClose() == false)
 	{
+		//Process
+		ball.Update();
 
 		BeginDrawing();
 
+		//Drawing objects to screen
 		ClearBackground(BackgroundColor);
 		ball.Draw(); //Ball
 
@@ -66,7 +75,6 @@ int main() {
 		DrawRectangle(ScreenSize.x - PaddleValues.Width - PaddleValues.ScreenPadding, RightPaddle.PosY, PaddleValues.Width, PaddleValues.Height, PaddleColor);
 
 		EndDrawing();
-
 	}
 
 	CloseWindow();
