@@ -43,6 +43,7 @@ class Paddle {
 		int Width;
 		int Height;
 		static const int Offset = 10;
+		static const int Speed = 10;
 		Color Color = { 109, 194, 185, 255 };
 
 	Paddle(float PositionX = 0, int width = 24, int height = 180) {
@@ -53,6 +54,13 @@ class Paddle {
 
 	void Draw() {
 		DrawRectangle(Position.x, Position.y, Width, Height, Color);
+	}
+
+	void Move() {
+		if (IsKeyDown(KEY_UP) && Position.y >= 0)
+			Position.y -= Speed;
+		if (IsKeyDown(KEY_DOWN) && Position.y <= ScreenSize.y - Height)
+			Position.y += Speed;
 	}
 };
 
@@ -78,6 +86,7 @@ int main() {
 	{
 		//Process
 		ball.Update();
+		PlayerPaddle.Move();
 
 		BeginDrawing();
 
