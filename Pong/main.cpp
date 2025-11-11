@@ -36,13 +36,28 @@ struct {
 	int Height = 180;
 } PaddleValues;
 
+
 class Paddle {
-public:
-	int PosY = (ScreenSize.y - PaddleValues.Height) / 2;
+	public:
+		Vector2 Position;
+		int Width;
+		int Height;
+		static const int Offset = 10;
+		Color Color = { 109, 194, 185, 255 };
+
+	Paddle(float PositionX = 0, int width = 24, int height = 180) {
+		Width = width;
+		Height = height;
+		Position = { PositionX, (ScreenSize.y - Height)/2 };
+	}
+
+	void Draw() {
+		DrawRectangle(Position.x, Position.y, Width, Height, Color);
+	}
 };
 
-Paddle LeftPaddle;
-Paddle RightPaddle;
+Paddle PlayerPaddle = Paddle();
+Paddle AIPaddle = Paddle();
 Ball ball = Ball(16, { ScreenSize.x / 2, ScreenSize.y / 2 }, { 4, 4 });
 
 int main() {
@@ -50,8 +65,9 @@ int main() {
 	//Ready
 
 	Color BackgroundColor = { 8, 94, 73, 255 };
-	Color PaddleColor = { 109, 194, 185, 255 };
-	Color LineColor = WHITE;
+
+	PlayerPaddle.Position = { Paddle::Offset , PlayerPaddle.Position.y };
+	AIPaddle.Position = { ScreenSize.x - Paddle::Offset - AIPaddle.Width , AIPaddle.Position.y };
 
 	InitWindow(ScreenSize.x, ScreenSize.y, "Pong");
 	SetTargetFPS(60);
@@ -71,8 +87,8 @@ int main() {
 
 		DrawLine(ScreenSize.x / 2, 0, ScreenSize.x / 2, ScreenSize.y, WHITE); //Seperator
 
-		DrawRectangle(0 + PaddleValues.ScreenPadding, LeftPaddle.PosY, PaddleValues.Width, PaddleValues.Height, PaddleColor);
-		DrawRectangle(ScreenSize.x - PaddleValues.Width - PaddleValues.ScreenPadding, RightPaddle.PosY, PaddleValues.Width, PaddleValues.Height, PaddleColor);
+		PlayerPaddle.Draw();
+		AIPaddle.Draw();
 
 		EndDrawing();
 	}
