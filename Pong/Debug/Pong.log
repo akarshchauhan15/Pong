@@ -1,0 +1,7 @@
+﻿  main.cpp
+E:\Projects\C++\Pong\Pong\main.cpp(1,10): error C1083: Cannot open include file: 'raylib.h': No such file or directory
+  objects.cpp
+E:\Projects\C++\Pong\Pong\objects.h(4,10): error C1083: Cannot open include file: 'raylib.h': No such file or directory
+  (compiling source file 'objects.cpp')
+  
+  Generating Code...
