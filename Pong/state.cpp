@@ -1,18 +1,21 @@
 #include "raygui.h"
 #include "state.h"
+#include "raymath.h"
 #include "objects.h"
 
 GameState CurrentState = GameState::MENU;
 
 float Volume = 0.5f;
 bool Fullscreen = false;
+float Vsync = 18;
 
 void DrawMenu() {
+
 	ClearBackground(BackgroundColor);
 
 	DrawText("Pong", 420, 100, 180, FavorVictoryColor);
 
-	if (GuiButton({ 490, 460, 300, 60 }, "Play"))
+	if (GuiButton({ 490, 460, 300, 60 }, "Play") || IsKeyPressed(KEY_ENTER))
 		CurrentState = PLAYING;
 	else if (GuiButton({ 490, 540, 300, 60 }, "Options"))
 		CurrentState = OPTIONS;
@@ -23,16 +26,31 @@ void DrawMenu() {
 void DrawOptions() {
 	DrawText("Options", 40, 24, 100, FavorVictoryColor);
 
-	/*GuiLabel((Rectangle){ 260, 200, 100, 20 }, "Volume");
-                volume = GuiSliderBar((Rectangle){ 360, 200, 200, 20 }, NULL, NULL, volume, 0.0f, 1.0f);
+	//Volume
+	GuiLabel({ 400, 240, 260, 20 }, "Volume");
+	GuiSliderBar({ 600, 240, 200, 20 }, NULL, NULL, &Volume, 0.0f, 1.0f);
+	GuiLabel({ 840, 240, 260, 20 }, TextFormat("%.0f", Volume * 100));
 
-                fullscreen = GuiCheckBox((Rectangle){ 360, 250, 20, 20 }, "Fullscreen", fullscreen);*/
+	//Fullscreen
+	GuiLabel({ 360, 320, 260, 20 }, "Fullscreen");
+	GuiCheckBox({ 680, 310, 40, 40 }, NULL, &Fullscreen);
 
-	GuiLabel({ 400, 300, 260, 20 }, "Volume");
-	Volume = GuiSliderBar({ 600, 300, 200, 20 }, NULL, NULL, &Volume, 0.0f, 1.0f);
-	Fullscreen = GuiCheckBox({ 360, 250, 20, 20 }, "Fullscreen", &Fullscreen);
+	//Vsync
+	GuiLabel({ 376, 400, 300, 20 }, "Max FPS");
+	GuiSliderBar({ 600, 400, 200, 20 }, NULL, NULL, &Vsync, 0, 30); // FPS = 30 + Val * 5
+	GuiLabel({ 840, 400, 260, 20 }, TextFormat("%.0f", 30 + roundf(Vsync) * 5));
 
-	if (GuiButton({ 1020, 620, 200, 60 }, "Back"))
+	DrawText("v0.1.0", 20, 680, 32, FavorVictoryColor);
+
+	if (GuiButton({ 800, 620, 200, 60 }, "Apply") || IsKeyPressed(KEY_ENTER)) {
+		SetMasterVolume(Volume);
+		if (Fullscreen != IsWindowFullscreen()) {
+			ToggleFullscreen();
+		}
+		SetTargetFPS(30 + roundf(Vsync) * 5);
+	}
+
+	if (GuiButton({ 1020, 620, 200, 60 }, "Back") || IsKeyPressed(KEY_ESCAPE))
 		CurrentState = MENU;
 }
 

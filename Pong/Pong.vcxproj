@@ -110,6 +110,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>E:\Projects\C++\Pong\External\Raylib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>raylib.lib;opengl32.lib;gdi32.lib;winmm.lib;kernel32.lib;user32.lib;shell32.lib</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,10 +126,11 @@
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>raylib.lib;opengl32.lib;gdi32.lib;winmm.lib;kernel32.lib;user32.lib;shell32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>E:\Projects\C++\Pong\External\Raylib\lib</AdditionalLibraryDirectories>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -11,6 +11,7 @@ typedef enum {
 
 extern float Volume;
 extern bool Fullscreen;
+extern float Vsync;
 
 extern GameState CurrentState;
 

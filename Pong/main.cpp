@@ -1,5 +1,6 @@
 #define RAYGUI_IMPLEMENTATION
 #define _CRT_SECURE_NO_DEPRECATE
+
 #include "raygui.h"
 #include "raylib.h"
 #include "objects.h"
@@ -44,9 +45,10 @@ int main() {
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	InitWindow(ScreenSize.x, ScreenSize.y, "Pong");
 	SetTargetFPS(120);
+	InitAudioDevice();
 
 	//Game
-	ball.Speed = { 4, 4 };
+	ball.Speed = ball.DefaultSpeed;
 	GuiSetStyle(DEFAULT, TEXT_SIZE, 48);
 	GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, ColorToInt(RAYWHITE));
 
@@ -78,8 +80,10 @@ int main() {
 			bool CollisionWithPlayerPaddle = (CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ PlayerPaddle.Position.x, PlayerPaddle.Position.y, (float)PlayerPaddle.Width, (float)PlayerPaddle.Height }) && ball.Speed.x < 0);
 			bool CollisionWithAIPaddle = (CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ AIPaddle.Position.x, AIPaddle.Position.y, (float)AIPaddle.Width, (float)AIPaddle.Height }) && ball.Speed.x > 0);
 
-			if (CollisionWithPlayerPaddle || CollisionWithAIPaddle)
+			if (CollisionWithPlayerPaddle || CollisionWithAIPaddle) {
 				ball.Speed.x *= -1;
+				ball.Accelerate();
+			}
 
 			DrawGame();
 
@@ -102,6 +106,9 @@ int main() {
 
 		EndDrawing();
 	}
+
 	CloseWindow();
+	CloseAudioDevice();
+
 	return 0;
 }
