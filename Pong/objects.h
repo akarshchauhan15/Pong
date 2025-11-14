@@ -10,6 +10,11 @@ extern Color HighlightedCircleColorFront;
 extern Color PaddleColor;
 extern Color FavorVictoryColor;
 
+extern Sound Collide1;
+extern Sound Collide2;
+
+void LoadSfx();
+
 class Ball {
 public:
 	Vector2 Position;

@@ -9,7 +9,16 @@ Color HighlightedCircleColorFront = { 87, 210, 170, 255 };
 Color PaddleColor = { 109, 194, 185, 255 };
 Color FavorVictoryColor = { 146, 240, 220, 255 };
 
+Sound Collide1;
+Sound Collide2;
 
+void LoadSfx() {
+	Collide1 = LoadSound("Assets/Sounds/Collide1.wav");
+	Collide2 = LoadSound("Assets/Sounds/Collide2.wav");
+
+	SetSoundVolume(Collide1, 0.6f);
+	SetSoundVolume(Collide2, 0.6f);
+}
 
 Ball::Ball(int radius, Vector2 position, Vector2 speed) {
 	Radius = radius;
@@ -26,8 +35,10 @@ void Ball::Update() {
 	Position.x += Speed.x * GetFrameTime();
 	Position.y += Speed.y * GetFrameTime();
 
-	if ((Position.y + Radius) >= ScreenSize.y || (Position.y - Radius) <= 0)
+	if ((Position.y + Radius) >= ScreenSize.y || (Position.y - Radius) <= 0) {
 		Speed.y *= -1;
+		PlaySound(Collide2);
+	}
 }
 void Ball::ResetBall() {
 	Position = { ScreenSize.x / 2, ScreenSize.y / 2 };

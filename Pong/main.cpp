@@ -13,6 +13,26 @@ Paddle PlayerPaddle = Paddle();
 CpuPaddle AIPaddle = CpuPaddle();
 Ball ball = Ball();
 
+
+void Startup() {
+
+	//Configuration
+	SetConfigFlags(FLAG_MSAA_4X_HINT);
+	SetExitKey(KEY_NULL);
+	
+	//Window
+	InitWindow(ScreenSize.x, ScreenSize.y, "Pong");
+	SetTargetFPS(120);
+
+	//Audio
+	InitAudioDevice();
+	LoadSfx();
+
+	//Gui
+	GuiSetStyle(DEFAULT, TEXT_SIZE, 48);
+	GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, ColorToInt(RAYWHITE));
+}
+
 void DrawScores() {
 
 	Color PlayerColor = WHITE;
@@ -28,6 +48,7 @@ void DrawScores() {
 }
 
 void AddScore() {
+
 	if ((ball.Position.x - ball.Radius) >= ScreenSize.x) {
 		PlayerPaddle.Score++;
 		ball.ResetBall();
@@ -39,19 +60,62 @@ void AddScore() {
 	}
 }
 
+void MainGameLoop() {
+
+	ClearBackground(BackgroundColor);
+
+	switch (CurrentState) {
+
+	case MENU: {
+		DrawMenu();
+	} break;
+
+	case PLAYING: {
+		//Process
+		ball.Update();
+		AddScore();
+		PlayerPaddle.Move();
+		AIPaddle.Move(ball.Position.y);
+
+		//Checking collisions
+
+		bool CollisionWithPlayerPaddle = (CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ PlayerPaddle.Position.x, PlayerPaddle.Position.y, (float)PlayerPaddle.Width, (float)PlayerPaddle.Height }) && ball.Speed.x < 0);
+		bool CollisionWithAIPaddle = (CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ AIPaddle.Position.x, AIPaddle.Position.y, (float)AIPaddle.Width, (float)AIPaddle.Height }) && ball.Speed.x > 0);
+
+		if (CollisionWithPlayerPaddle || CollisionWithAIPaddle) {
+			ball.Speed.x *= -1;
+			ball.Accelerate();
+			PlaySound(Collide1);
+		}
+
+		DrawGame();
+
+		//Objects
+		ball.Draw();
+		PlayerPaddle.Draw();
+		AIPaddle.Draw();
+
+		DrawScores();
+	}break;
+
+	case OPTIONS: {
+		DrawOptions();
+	}break;
+
+	case EXIT: {
+		Running = false;
+	}break;
+	}
+
+}
+
 int main() {
 
-	//Ready
-	SetConfigFlags(FLAG_MSAA_4X_HINT);
-	InitWindow(ScreenSize.x, ScreenSize.y, "Pong");
-	SetTargetFPS(120);
-	InitAudioDevice();
+	Startup();
 
 	//Game
 	ball.Speed = ball.DefaultSpeed;
-	GuiSetStyle(DEFAULT, TEXT_SIZE, 48);
-	GuiSetStyle(LABEL, TEXT_COLOR_NORMAL, ColorToInt(RAYWHITE));
-
+	
 	PlayerPaddle.Position = { float(PlayerPaddle.Offset) , PlayerPaddle.Position.y };
 	AIPaddle.Position = { ScreenSize.x - float(AIPaddle.Offset) - AIPaddle.Width , AIPaddle.Position.y };
 
@@ -60,55 +124,14 @@ int main() {
 	while (Running && WindowShouldClose() == false)
 	{
 		BeginDrawing();
-		ClearBackground(BackgroundColor);
 
-		switch (CurrentState) {
-
-		case MENU: {
-			DrawMenu();
-		} break;
-
-		case PLAYING: {
-			//Process
-			ball.Update();
-			AddScore();
-			PlayerPaddle.Move();
-			AIPaddle.Move(ball.Position.y);
-
-			//Checking collisions
-
-			bool CollisionWithPlayerPaddle = (CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ PlayerPaddle.Position.x, PlayerPaddle.Position.y, (float)PlayerPaddle.Width, (float)PlayerPaddle.Height }) && ball.Speed.x < 0);
-			bool CollisionWithAIPaddle = (CheckCollisionCircleRec(ball.Position, ball.Radius, Rectangle{ AIPaddle.Position.x, AIPaddle.Position.y, (float)AIPaddle.Width, (float)AIPaddle.Height }) && ball.Speed.x > 0);
-
-			if (CollisionWithPlayerPaddle || CollisionWithAIPaddle) {
-				ball.Speed.x *= -1;
-				ball.Accelerate();
-			}
-
-			DrawGame();
-
-			//Objects
-			ball.Draw();
-			PlayerPaddle.Draw();
-			AIPaddle.Draw();
-
-			DrawScores();
-		}break;
-
-		case OPTIONS: {
-			DrawOptions();
-		}break;
-
-		case EXIT: {
-			Running = false;
-		}break;
-		}
-
+		MainGameLoop();
+		
 		EndDrawing();
 	}
 
-	CloseWindow();
 	CloseAudioDevice();
+	CloseWindow();
 
 	return 0;
 }

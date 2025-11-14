@@ -5,7 +5,7 @@
 
 GameState CurrentState = GameState::MENU;
 
-float Volume = 0.5f;
+float Volume = 0.8f;
 bool Fullscreen = false;
 float Vsync = 18;
 
